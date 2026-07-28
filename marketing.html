@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VERIDA — Identity & Access Management for the Modern Enterprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0a0a0f;
+    --bg-1: #0f0f18;
+    --bg-2: #151520;
+    --bg-3: #1c1c2a;
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hi: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hi: rgba(255, 255, 255, 0.14);
+    --text: #e8e8f0;
+    --text-dim: #9a9ab0;
+    --text-mute: #6a6a80;
+    --accent: #7c5cff;
+    --accent-2: #06d4c4;
+    --accent-3: #ff6b9d;
+    --success: #3ddc97;
+    --warn: #ffb547;
+    --danger: #ff5c7a;
+    --grad: linear-gradient(135deg, #7c5cff 0%, #06d4c4 100%);
+    --grad-soft: linear-gradient(135deg, rgba(124,92,255,0.15) 0%, rgba(6,212,196,0.15) 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-0);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ BACKGROUND EFFECTS ============ */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(124,92,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  }
+  .bg-orb {
+    position: fixed; border-radius: 50%; filter: blur(100px);
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+  .bg-orb-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: #7c5cff; }
+  .bg-orb-2 { top: 30%; right: -15%; width: 500px; height: 500px; background: #06d4c4; opacity: 0.25; }
+  .bg-orb-3 { bottom: -20%; left: 20%; width: 700px; height: 700px; background: #ff6b9d; opacity: 0.15; }
+
+  /* ============ NAVIGATION ============ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 18px 40px;
+    backdrop-filter: blur(20px);
+    background: rgba(10, 10, 15, 0.7);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .nav-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 20px; letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .logo-mark::before {
+    content: ''; position: absolute; inset: 2px;
+    background: var(--bg-0); border-radius: 6px;
+  }
+  .logo-mark::after {
+    content: ''; position: absolute;
+    width: 14px; height: 14px;
+    background: var(--grad);
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    color: var(--text-dim); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-actions { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    padding: 10px 20px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: inherit;
+  }
+  .btn-ghost { background: transparent; color: var(--text); }
+  .btn-ghost:hover { background: var(--surface-hi); }
+  .btn-primary {
+    background: var(--grad); color: white;
+    box-shadow: 0 4px 20px rgba(124, 92, 255, 0.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(124, 92, 255, 0.5); }
+  .btn-outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-hi);
+  }
+  .btn-outline:hover { background: var(--surface-hi); border-color: var(--accent); }
+  .btn-lg { padding: 14px 28px; font-size: 15px; }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative; z-index: 1;
+    padding: 160px 40px 80px;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-dim);
+    margin-bottom: 28px;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    max-width: 1000px;
+  }
+  .hero h1 .grad {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero h1 .serif {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  .hero-sub {
+    font-size: 19px; color: var(--text-dim);
+    max-width: 640px; margin-bottom: 40px;
+    line-height: 1.6;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 60px; }
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 40px; padding-top: 40px;
+    border-top: 1px solid var(--border);
+    max-width: 900px;
+  }
+  .stat-num {
+    font-size: 36px; font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 13px; color: var(--text-mute);
+    margin-top: 4px;
+  }
+
+  /* ============ HERO VISUAL (LOGIN DEMO) ============ */
+  .hero-visual {
+    margin-top: 80px;
+    position: relative;
+    perspective: 2000px;
+  }
+  .login-demo {
+    background: var(--bg-1);
+    border: 1px solid var(--border-hi);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 50px 100px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(124,92,255,0.1);
+    transform: rotateX(2deg);
+    transition: transform 0.5s;
+  }
+  .login-demo:hover { transform: rotateX(0deg); }
+  .browser-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .browser-dots { display: flex; gap: 6px; }
+  .browser-dots span {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--bg-3);
+  }
+  .browser-url {
+    flex: 1; padding: 6px 14px;
+    background: var(--bg-0);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .lock-icon { color: var(--success); }
+  .login-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 480px;
+  }
+  .login-left {
+    padding: 50px;
+    display: flex; flex-direction: column; justify-content: center;
+    background: linear-gradient(135deg, rgba(124,92,255,0.08), rgba(6,212,196,0.04));
+    border-right: 1px solid var(--border);
+  }
+  .login-left h3 {
+    font-size: 28px; font-weight: 700;
+    margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .login-left p { color: var(--text-dim); margin-bottom: 30px; }
+  .sso-providers { display: flex; flex-direction: column; gap: 10px; }
+  .sso-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .sso-btn:hover { background: var(--surface-hi); border-color: var(--border-hi); }
+  .sso-btn .ico {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .sso-google { background: #fff; color: #1a1a1a; }
+  .sso-ms { background: #0078d4; color: white; }
+  .sso-okta { background: #007dc1; color: white; }
+  .sso-saml { background: var(--grad); color: white; }
+
+  .login-right {
+    padding: 50px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .login-step {
+    padding: 18px; border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 14px;
+    opacity: 0.5;
+    transition: all 0.4s;
+  }
+  .login-step.active {
+    opacity: 1;
+    border-color: var(--accent);
+    background: rgba(124,92,255,0.08);
+  }
+  .login-step.done {
+    opacity: 1;
+    border-color: var(--success);
+    background: rgba(61,220,151,0.05);
+  }
+  .step-indicator {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bg-3);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .login-step.active .step-indicator {
+    background: var(--grad); color: white;
+  }
+  .login-step.done .step-indicator {
+    background: var(--success); color: white;
+  }
+  .step-text { flex: 1; }
+  .step-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .step-desc { font-size: 12px; color: var(--text-mute); }
+  .step-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-mute);
+  }
+  .login-step.active .step-status { color: var(--accent); }
+  .login-step.done .step-status { color: var(--success); }
+
+  .floating-card {
+    position: absolute;
+    background: var(--bg-1);
+    border: 1px solid var(--border-hi);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .fc-1 {
+    top: -30px; right: -40px;
+    animation-delay: 0s;
+  }
+  .fc-2 {
+    bottom: 40px; left: -60px;
+    animation-delay: 2s;
+  }
+  .fc-row { display: flex; align-items: center; gap: 10px; }
+  .fc-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .fc-label { font-size: 12px; color: var(--text-mute); }
+  .fc-value { font-size: 14px; font-weight: 600; }
+
+  /* ============ TRUST BAR ============ */
+  .trust {
+    position: relative; z-index: 1;
+    padding: 60px 40px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+  .trust-inner { max-width: 1400px; margin: 0 auto; text-align: center; }
+  .trust-label {
+    font-size: 12px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.15em;
+    margin-bottom: 30px;
+  }
+  .trust-logos {
+    display: flex; justify-content: space-around;
+    align-items: center; flex-wrap: wrap; gap: 40px;
+  }
+  .trust-logo {
+    font-weight: 700; font-size: 22px;
+    color: var(--text-mute);
+    letter-spacing: -0.02em;
+    opacity: 0.6; transition: opacity 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .trust-logo:hover { opacity: 1; }
+  .trust-logo .mark {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--surface-hi);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ============ SECTIONS ============ */
+  section { position: relative; z-index: 1; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .section-pad { padding: 120px 0; }
+  .section-head { max-width: 720px; margin-bottom: 70px; }
+  .section-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    padding: 4px 12px;
+    background: rgba(124,92,255,0.1);
+    border: 1px solid rgba(124,92,255,0.2);
+    border-radius: 100px;
+  }
+  .section-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.1; margin-bottom: 20px;
+  }
+  .section-title .serif {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400; font-style: italic;
+  }
+  .section-desc {
+    font-size: 18px; color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ============ FEATURES GRID ============ */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(124,92,255,0.1), transparent 40%);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .feature-card:hover { border-color: var(--border-hi); transform: translateY(-4px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-card.span-6 { grid-column: span 6; }
+  .feature-card.span-4 { grid-column: span 4; }
+  .feature-card.span-8 { grid-column: span 8; }
+  .feature-card.span-12 { grid-column: span 12; }
+
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--grad-soft);
+    border: 1px solid rgba(124,92,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+  }
+  .feature-title {
+    font-size: 20px; font-weight: 600;
+    margin-bottom: 10px; letter-spacing: -0.01em;
+  }
+  .feature-desc {
+    color: var(--text-dim); font-size: 15px;
+    line-height: 1.6;
+  }
+  .feature-list {
+    list-style: none; margin-top: 16px;
+  }
+  .feature-list li {
+    padding: 8px 0;
+    font-size: 14px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .feature-list li:first-child { border-top: none; }
+  .feature-list li::before {
+    content: '→'; color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ============ ARCHITECTURE DIAGRAM ============ */
+  .arch-section { background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .arch-diagram {
+    background: var(--bg-0);
+    border: 1px solid var(--border-hi);
+    border-radius: 20px;
+    padding: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .arch-diagram::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,255,0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.5;
+  }
+  .arch-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .arch-col { display: flex; flex-direction: column; gap: 14px; }
+  .arch-node {
+    padding: 16px 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--border-hi);
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 10px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .arch-node:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+  }
+  .arch-node .ico {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--grad-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .arch-center {
+    padding: 40px 30px;
+    background: var(--grad);
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 20px 60px rgba(124,92,255,0.4);
+    position: relative;
+  }
+  .arch-center::before {
+    content: ''; position: absolute; inset: -2px;
+    background: var(--grad);
+    border-radius: 18px;
+    filter: blur(20px);
+    opacity: 0.5;
+    z-index: -1;
+  }
+  .arch-center h4 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .arch-center p { font-size: 13px; opacity: 0.9; }
+  .arch-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 20px;
+    text-align: center;
+  }
+  .arch-label {
+    font-size: 11px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.15em;
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ============ DASHBOARD PREVIEW ============ */
+  .dashboard-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .dashboard {
+    background: var(--bg-1);
+    border: 1px solid var(--border-hi);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  }
+  .dash-top {
+    display: flex; align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .dash-top .dots { display: flex; gap: 5px; }
+  .dash-top .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--bg-3); }
+  .dash-tabs {
+    display: flex; gap: 4px; margin-left: 20px;
+  }
+  .dash-tab {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 12px; color: var(--text-mute);
+    cursor: pointer;
+  }
+  .dash-tab.active { background: var(--surface-hi); color: var(--text); }
+  .dash-body {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 500px;
+  }
+  .dash-side {
+    background: var(--bg-2);
+    border-right: 1px solid var(--border);
+    padding: 16px 10px;
+  }
+  .dash-menu-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    margin-bottom: 2px;
+  }
+  .dash-menu-item.active {
+    background: rgba(124,92,255,0.15);
+    color: var(--text);
+  }
+  .dash-menu-item .mi { opacity: 0.7; }
+  .dash-main { padding: 20px; }
+  .dash-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .dash-head h3 { font-size: 18px; font-weight: 600; }
+  .dash-search {
+    padding: 6px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .users-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 500;
+    color: var(--text-mute);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+  }
+  .users-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .user-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white;
+  }
+  .role-badge {
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .role-admin { background: rgba(255,107,157,0.15); color: var(--accent-3); }
+  .role-editor { background: rgba(124,92,255,0.15); color: var(--accent); }
+  .role-viewer { background: rgba(6,212,196,0.15); color: var(--accent-2); }
+  .status-dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; margin-right: 6px;
+  }
+  .status-active { background: var(--success); box-shadow: 0 0 6px var(--success); }
+  .status-pending { background: var(--warn); }
+
+  .dash-features {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .dash-feat {
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex; gap: 16px;
+  }
+  .dash-feat-ico {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--grad-soft);
+    border: 1px solid rgba(124,92,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .dash-feat h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .dash-feat p { font-size: 14px; color: var(--text-dim); }
+
+  /* ============ USE CASES ============ */
+  .usecases {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .usecase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 30px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .usecase:hover {
+    border-color: var(--border-hi);
+    transform: translateY(-4px);
+  }
+  .usecase::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: var(--grad);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .usecase:hover::before { transform: scaleX(1); }
+  .usecase-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent-2);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 14px;
+  }
+  .usecase h3 {
+    font-size: 24px; font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .usecase p {
+    color: var(--text-dim); font-size: 15px;
+    margin-bottom: 20px;
+  }
+  .usecase-points { list-style: none; }
+  .usecase-points li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex; gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .usecase-points li:first-child { border-top: none; }
+  .usecase-points li::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  /* ============ PROTOCOLS ============ */
+  .protocols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .protocol {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s;
+  }
+  .protocol:hover {
+    border-color: var(--accent);
+    background: rgba(124,92,255,0.05);
+  }
+  .protocol-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 600;
+    margin-bottom: 6px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .protocol-desc {
+    font-size: 13px; color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .protocol-meta {
+    display: flex; gap: 12px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .protocol-meta span {
+    padding: 3px 8px;
+    background: var(--bg-2);
+    border-radius: 4px;
+    color: var(--text-mute);
+  }
+
+  /* ============ COMPLIANCE ============ */
+  .compliance-section { background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .compliance-card {
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .compliance-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .compliance-name {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .compliance-desc {
+    font-size: 12px; color: var(--text-mute);
+  }
+
+  /* ============ PRICING ============ */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 30px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .price-card:hover { border-color: var(--border-hi); }
+  .price-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, rgba(124,92,255,0.08), var(--surface));
+  }
+  .price-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    background: var(--grad);
+    border-radius: 100px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em;
+    color: white;
+  }
+  .price-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+  .price-amount {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .price-amount .num {
+    font-size: 48px; font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .price-amount .per {
+    font-size: 14px; color: var(--text-mute);
+  }
+  .price-desc {
+    font-size: 14px; color: var(--text-dim);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-features { list-style: none; margin-bottom: 28px; }
+  .price-features li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex; gap: 10px;
+  }
+  .price-features li::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 700;
+  }
+  .price-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-hi);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .price-btn:hover { background: var(--surface-hi); }
+  .price-card.featured .price-btn {
+    background: var(--grad);
+    border: none;
+    color: white;
+  }
+  .price-card.featured .price-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124,92,255,0.4);
+  }
+
+  /* ============ TESTIMONIAL ============ */
+  .testimonial {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .testimonial::before {
+    content: '"';
+    position: absolute;
+    top: -40px; left: 30px;
+    font-family: 'Instrument Serif', serif;
+    font-size: 200px;
+    color: var(--accent);
+    opacity: 0.15;
+    line-height: 1;
+  }
+  .testimonial-quote {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    margin-bottom: 30px;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+  }
+  .testimonial-author {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .testimonial-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px;
+  }
+  .testimonial-name { font-weight: 600; font-size: 16px; }
+  .testimonial-role { font-size: 14px; color: var(--text-mute); }
+
+  /* ============ CTA ============ */
+  .cta-section {
+    padding: 120px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(124,92,255,0.15), transparent 70%);
+  }
+  .cta-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+  .cta-content h2 {
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .cta-content p {
+    font-size: 19px;
+    color: var(--text-dim);
+    margin-bottom: 36px;
+  }
+  .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  /* ============ FOOTER ============ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 40px 30px;
+    background: var(--bg-1);
+    position: relative; z-index: 1;
+  }
+  .footer-grid {
+    max-width: 1400px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 50px;
+  }
+  .footer-brand p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin: 16px 0;
+    max-width: 300px;
+  }
+  .footer-col h5 {
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .footer-col a {
+    display: block;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 0;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--text); }
+  .footer-bottom {
+    max-width: 1400px; margin: 0 auto;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center;
+    font-size: 13px; color: var(--text-mute);
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-bottom-links { display: flex; gap: 24px; }
+  .footer-bottom-links a { color: var(--text-mute); text-decoration: none; }
+  .footer-bottom-links a:hover { color: var(--text); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .feature-card.span-6, .feature-card.span-4, .feature-card.span-8 { grid-column: span 12; }
+    .login-body { grid-template-columns: 1fr; }
+    .login-left { border-right: none; border-bottom: 1px solid var(--border); }
+    .arch-flow { grid-template-columns: 1fr; }
+    .arch-arrow { transform: rotate(90deg); }
+    .dashboard-wrap { grid-template-columns: 1fr; }
+    .usecases, .pricing-grid { grid-template-columns: 1fr; }
+    .protocols, .compliance-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 640px) {
+    nav { padding: 14px 20px; }
+    .hero, .cta-section { padding-left: 20px; padding-right: 20px; }
+    .container { padding: 0 20px; }
+    .section-pad { padding: 80px 0; }
+    .protocols, .compliance-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .testimonial { padding: 40px 24px; }
+    .testimonial-quote { font-size: 20px; }
+    .arch-diagram { padding: 24px; }
+    .floating-card { display: none; }
+  }
+
+  /* ============ ANIMATIONS ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      VERIDA
+    </div>
+    <div class="nav-links">
+      <a href="#features">Platform</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#usecases">Solutions</a>
+      <a href="#protocols">Protocols</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#docs">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="#" class="btn btn-ghost">Sign in</a>
+      <a href="#" class="btn btn-primary">Start free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    SOC 2 Type II · ISO 27001 · GDPR · HIPAA
+  </div>
+  <h1>
+    Identity, <span class="serif">simplified</span>.<br>
+    Access, <span class="grad">orchestrated</span>.
+  </h1>
+  <p class="hero-sub">
+    VERIDA is the identity platform built for teams that ship fast and sleep well.
+    Single sign-on, MFA, role-based access, and directory sync — unified in one
+    developer-friendly API.
+  </p>
+  <div class="hero-cta">
+    <a href="#" class="btn btn-primary btn-lg">Start building free →</a>
+    <a href="#" class="btn btn-outline btn-lg">Book a demo</a>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">2.4B+</div>
+      <div class="stat-label">Authentications / month</div>
+    </div>
+    <div>
+      <div class="stat-num">99.99%</div>
+      <div class="stat-label">Platform uptime SLA</div>
+    </div>
+    <div>
+      <div class="stat-num">140+</div>
+      <div class="stat-label">Pre-built integrations</div>
+    </div>
+    <div>
+      <div class="stat-num">&lt;50ms</div>
+      <div class="stat-label">Median auth latency</div>
+    </div>
+  </div>
+
+  <!-- ============ LOGIN DEMO ============ -->
+  <div class="hero-visual">
+    <div class="login-demo">
+      <div class="browser-bar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-url">
+          <span class="lock-icon">🔒</span>
+          auth.acme.io/login?redirect=app.acme.io/dashboard
+        </div>
+      </div>
+      <div class="login-body">
+        <div class="login-left">
+          <h3>Sign in to Acme</h3>
+          <p>Choose your identity provider to continue securely.</p>
+          <div class="sso-providers">
+            <button class="sso-btn"><span class="ico sso-google">G</span> Continue with Google Workspace</button>
+            <button class="sso-btn"><span class="ico sso-ms">M</span> Continue with Microsoft Entra</button>
+            <button class="sso-btn"><span class="ico sso-okta">O</span> Continue with Okta</button>
+            <button class="sso-btn"><span class="ico sso-saml">S</span> Enterprise SSO (SAML 2.0)</button>
+          </div>
+        </div>
+        <div class="login-right">
+          <div class="login-step done" id="step-1">
+            <div class="step-indicator">✓</div>
+            <div class="step-text">
+              <div class="step-title">User identified</div>
+              <div class="step-desc">sarah.chen@acme.io via Google Workspace</div>
+            </div>
+            <div class="step-status">200 OK</div>
+          </div>
+          <div class="login-step done" id="step-2">
+            <div class="step-indicator">✓</div>
+            <div class="step-text">
+              <div class="step-title">MFA verified</div>
+              <div class="step-desc">FIDO2 · YubiKey 5 · Registered Jul 12</div>
+            </div>
+            <div class="step-status">200 OK</div>
+          </div>
+          <div class="login-step active" id="step-3">
+            <div class="step-indicator">3</div>
+            <div class="step-text">
+              <div class="step-title">Evaluating policies</div>
+              <div class="step-desc">RBAC · Conditional access · Device trust</div>
+            </div>
+            <div class="step-status">processing…</div>
+          </div>
+          <div class="login-step" id="step-4">
+            <div class="step-indicator">4</div>
+            <div class="step-text">
+              <div class="step-title">Issue tokens</div>
+              <div class="step-desc">OIDC id_token + access_token (15m)</div>
+            </div>
+            <div class="step-status">pending</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="floating-card fc-1">
+      <div class="fc-row">
+        <div class="fc-icon" style="background: rgba(61,220,151,0.15); color: var(--success);">🛡</div>
+        <div>
+          <div class="fc-label">Threat blocked</div>
+          <div class="fc-value">Impossible travel</div>
+        </div>
+      </div>
+    </div>
+    <div class="floating-card fc-2">
+      <div class="fc-row">
+        <div class="fc-icon" style="background: rgba(124,92,255,0.15); color: var(--accent);">⚡</div>
+        <div>
+          <div class="fc-label">Session</div>
+          <div class="fc-value">42ms · JWT issued</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST BAR ============ -->
+<section class="trust">
+  <div class="trust-inner">
+    <div class="trust-label">Trusted by security teams at</div>
+    <div class="trust-logos">
+      <div class="trust-logo"><span class="mark">◆</span> Northwind</div>
+      <div class="trust-logo"><span class="mark">▲</span> Helios Labs</div>
+      <div class="trust-logo"><span class="mark">●</span> Meridian Health</div>
+      <div class="trust-logo"><span class="mark">◼</span> Atlas University</div>
+      <div class="trust-logo"><span class="mark">✦</span> Quantum SaaS</div>
+      <div class="trust-logo"><span class="mark">◈</span> Finova</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="section-pad" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Platform</div>
+      <h2 class="section-title">Eight primitives. <span class="serif">One platform.</span></h2>
+      <p class="section-desc">
+        Everything you need to authenticate users, authorize access, and audit every action —
+        without stitching together five different vendors.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card span-6 reveal">
+        <div class="feature-icon">🔐</div>
+        <div class="feature-title">Single Sign-On</div>
+        <div class="feature-desc">
+          One login for every app. SAML 2.0, OIDC, and passwordless — configured in minutes,
+          not sprints.
+        </div>
+        <ul class="feature-list">
+          <li>140+ pre-built app connectors</li>
+          <li>Just-in-time user provisioning (SCIM 2.0)</li>
+          <li>IdP-initiated and SP-initiated flows</li>
+          <li>Custom claim & attribute mapping</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-6 reveal">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Multi-Factor Authentication</div>
+        <div class="feature-desc">
+          Step-up authentication that adapts to risk. From SMS to FIDO2, every factor is supported
+          with policy-driven enforcement.
+        </div>
+        <ul class="feature-list">
+          <li>FIDO2 / WebAuthn passkeys</li>
+          <li>Authenticator apps (TOTP) & push</li>
+          <li>Biometric on mobile (Face ID, Touch ID)</li>
+          <li>Backup codes & recovery flows</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-8 reveal">
+        <div class="feature-icon">👥</div>
+        <div class="feature-title">Role-Based Access Control</div>
+        <div class="feature-desc">
+          Model permissions the way your business actually works. Define roles, assign them to
+          users or groups, and let policies do the rest. Supports ABAC and ReBAC for fine-grained
+          scenarios.
+        </div>
+        <ul class="feature-list">
+          <li>Unlimited roles, groups, and nested hierarchies</li>
+          <li>Attribute-based policies with CEL expressions</li>
+          <li>Relationship-based access (ReBAC) via graph engine</li>
+          <li>Permission previews & dry-run evaluation</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-4 reveal">
+        <div class="feature-icon">⚙️</div>
+        <div class="feature-title">User Provisioning</div>
+        <div class="feature-desc">
+          Automate the joiner-mover-leaver lifecycle across every connected system.
+        </div>
+        <ul class="feature-list">
+          <li>SCIM 2.0 inbound & outbound</li>
+          <li>HRIS → IdP sync (Workday, BambooHR)</li>
+          <li>Automated deprovisioning</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-4 reveal">
+        <div class="feature-icon">📜</div>
+        <div class="feature-title">Audit Logs</div>
+        <div class="feature-desc">
+          Every authentication, every policy decision, every admin action — captured and
+          searchable for 7 years.
+        </div>
+        <ul class="feature-list">
+          <li>Immutable, cryptographically signed</li>
+          <li>Stream to SIEM (Splunk, Datadog)</li>
+          <li>Retention up to 7 years</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-4 reveal">
+        <div class="feature-icon">🔑</div>
+        <div class="feature-title">API Authentication</div>
+        <div class="feature-desc">
+          Secure machine-to-machine traffic with short-lived tokens, scoped keys, and
+          per-endpoint policies.
+        </div>
+        <ul class="feature-list">
+          <li>OAuth 2.0 client credentials</li>
+          <li>API keys with rotation & scopes</li>
+          <li>mTLS and JWT assertion</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-6 reveal">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-title">OAuth 2.0 & OpenID Connect</div>
+        <div class="feature-desc">
+          A certified OIDC provider you can trust. Build your own login experience on top of
+          VERIDA's standards-compliant authorization server.
+        </div>
+        <ul class="feature-list">
+          <li>OpenID Certified™ (Basic, Implicit, Hybrid, Config)</li>
+          <li>Authorization Code + PKCE, Device, CIBA</li>
+          <li>Custom grant types & token hooks</li>
+          <li>Hosted or embedded login (Headless)</li>
+        </ul>
+      </div>
+
+      <div class="feature-card span-6 reveal">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Directory Synchronization</div>
+        <div class="feature-desc">
+          Keep identities in sync across Active Directory, Entra ID, Google Workspace, LDAP,
+          and any SCIM-compliant source — in real time.
+        </div>
+        <ul class="feature-list">
+          <li>AD / Entra / Google / LDAP connectors</li>
+          <li>Delta sync with sub-minute latency</li>
+          <li>Attribute transformation & mapping</li>
+          <li>Conflict resolution & reconciliation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="section-pad arch-section" id="architecture">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Architecture</div>
+      <h2 class="section-title">From user to <span class="serif">decision</span>, in milliseconds.</h2>
+      <p class="section-desc">
+        VERIDA sits at the center of your identity fabric — connecting users, devices,
+        applications, and policies through a single, observable control plane.
+      </p>
+    </div>
+
+    <div class="arch-diagram reveal">
+      <div class="arch-flow">
+        <div class="arch-col">
+          <div class="arch-label">Identity Sources</div>
+          <div class="arch-node"><span class="ico">👤</span> Active Directory</div>
+          <div class="arch-node"><span class="ico">☁️</span> Entra ID / Google</div>
+          <div class="arch-node"><span class="ico">🏢</span> Workday / HRIS</div>
+          <div class="arch-node"><span class="ico">📁</span> LDAP / Custom DB</div>
+        </div>
+
+        <div class="arch-arrow">→ → →</div>
+
+        <div class="arch-center">
+          <h4>VERIDA</h4>
+          <p>Identity Control Plane</p>
+          <div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.9;">
+            AuthN · AuthZ · Directory · Audit
+          </div>
+        </div>
+
+        <div class="arch-arrow">→ → →</div>
+
+        <div class="arch-col">
+          <div class="arch-label">Protected Resources</div>
+          <div class="arch-node"><span class="ico">💻</span> Web applications</div>
+          <div class="arch-node"><span class="ico">📱</span> Mobile apps</div>
+          <div class="arch-node"><span class="ico">⚡</span> APIs & microservices</div>
+          <div class="arch-node"><span class="ico">🖥️</span> Infrastructure (SSH, VPN)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="section-pad" id="dashboard">
+  <div class="container">
+    <div class="dashboard-wrap">
+      <div class="reveal">
+        <div class="section-tag">// Console</div>
+        <h2 class="section-title">A console your <span class="serif">security team</span> will love.</h2>
+        <p class="section-desc" style="margin-bottom: 30px;">
+          Manage users, roles, policies, and audit trails from a single pane of glass.
+          Built for operators who care about details — and velocity.
+        </p>
+        <div class="dash-features">
+          <div class="dash-feat">
+            <div class="dash-feat-ico">📊</div>
+            <div>
+              <h4>Real-time observability</h4>
+              <p>Live authentication events, failed login heatmaps, and policy evaluation traces.</p>
+            </div>
+          </div>
+          <div class="dash-feat">
+            <div class="dash-feat-ico">🧪</div>
+            <div>
+              <h4>Policy simulator</h4>
+              <p>Test any access decision against real user attributes before you ship it.</p>
+            </div>
+          </div>
+          <div class="dash-feat">
+            <div class="dash-feat-ico">🔌</div>
+            <div>
+              <h4>Terraform & Pulumi native</h4>
+              <p>Everything in the console is also code. Manage roles, apps, and policies as IaC.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard reveal">
+        <div class="dash-top">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="dash-tabs">
+            <div class="dash-tab active">Users</div>
+            <div class="dash-tab">Groups</div>
+            <div class="dash-tab">Roles</div>
+            <div class="dash-tab">Policies</div>
+            <div class="dash-tab">Audit</div>
+          </div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-side">
+            <div class="dash-menu-item active"><span class="mi">👥</span> Directory</div>
+            <div class="dash-menu-item"><span class="mi">🔐</span> Applications</div>
+            <div class="dash-menu-item"><span class="mi">🛡️</span> Policies</div>
+            <div class="dash-menu-item"><span class="mi">🔑</span> API Keys</div>
+            <div class="dash-menu-item"><span class="mi">📜</span> Audit Log</div>
+            <div class="dash-menu-item"><span class="mi">⚙️</span> Settings</div>
+          </div>
+          <div class="dash-main">
+            <div class="dash-head">
+              <h3>Users · 12,847</h3>
+              <div class="dash-search">⌘K search users…</div>
+            </div>
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Last login</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar">SC</div> sarah.chen@acme.io</div></td>
+                  <td><span class="role-badge role-admin">admin</span></td>
+                  <td><span class="status-dot status-active"></span>Active</td>
+                  <td>2 min ago</td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar">MR</div> marcus.reed@acme.io</div></td>
+                  <td><span class="role-badge role-editor">editor</span></td>
+                  <td><span class="status-dot status-active"></span>Active</td>
+                  <td>1 hr ago</td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar">AP</div> aisha.patel@acme.io</div></td>
+                  <td><span class="role-badge role-viewer">viewer</span></td>
+                  <td><span class="status-dot status-active"></span>Active</td>
+                  <td>Yesterday</td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar">JK</div> jonas.kim@acme.io</div></td>
+                  <td><span class="role-badge role-editor">editor</span></td>
+                  <td><span class="status-dot status-pending"></span>Pending MFA</td>
+                  <td>3 days ago</td>
+                </tr>
+                <tr>
+                  <td><div class="user-cell"><div class="avatar">LO</div> lucia.ortiz@acme.io</div></td>
+                  <td><span class="role-badge role-viewer">viewer</span></td>
+                  <td><span class="status-dot status-active"></span>Active</td>
+                  <td>5 min ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USE CASES ============ -->
+<section class="section-pad" id="usecases" style="background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Solutions</div>
+      <h2 class="section-title">Built for the way <span class="serif">you</span> work.</h2>
+      <p class="section-desc">
+        Whether you're shipping a SaaS product, running a global enterprise, or managing a
+        university with 80,000 identities — VERIDA adapts to your model.
+      </p>
+    </div>
+
+    <div class="usecases">
+      <div class="usecase reveal">
+        <div class="usecase-tag">For SaaS companies</div>
+        <h3>Ship auth in a week, not a quarter</h3>
+        <p>
+          Add enterprise-grade SSO and SCIM to your product without building an identity team.
+          Close bigger deals with the security features buyers demand.
+        </p>
+        <ul class="usecase-points">
+          <li>Multi-tenant by default, per-customer IdP config</li>
+          <li>White-labeled hosted login pages</li>
+          <li>Customer-managed MFA & session policies</li>
+          <li>SDKs for React, Next.js, Node, Python, Go, Ruby</li>
+        </ul>
+      </div>
+
+      <div class="usecase reveal">
+        <div class="usecase-tag">For enterprises</div>
+        <h3>Consolidate five IdPs into one control plane</h3>
+        <p>
+          Replace fragmented identity stacks with a single platform that connects to every
+          directory, every app, and every compliance framework.
+        </p>
+        <ul class="usecase-points">
+          <li>Multi-forest AD & Entra ID federation</li>
+          <li>Zero Trust access policies (device + risk + context)</li>
+          <li>Privileged access management & just-in-time elevation</li>
+          <li>Dedicated tenant, region-locked data residency</li>
+        </ul>
+      </div>
+
+      <div class="usecase reveal">
+        <div class="usecase-tag">For universities</div>
+        <h3>One identity for students, staff, alumni, guests</h3>
+        <p>
+          Support the complex lifecycle of academic identities — from admissions through
+          alumni — with policies that respect FERPA and campus culture.
+        </p>
+        <ul class="usecase-points">
+          <li>SIS & LMS sync (Banner, Canvas, Blackboard)</li>
+          <li>Semester-based role transitions</li>
+          <li>Alumni & guest access with expiration</li>
+          <li>Research computing & HPC access controls</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROTOCOLS ============ -->
+<section class="section-pad" id="protocols">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Protocols</div>
+      <h2 class="section-title">Standards, <span class="serif">implemented right.</span></h2>
+      <p class="section-desc">
+        VERIDA is OpenID Certified and passes all major conformance suites. We speak every
+        protocol your apps and partners already use.
+      </p>
+    </div>
+
+    <div class="protocols">
+      <div class="protocol reveal">
+        <div class="protocol-name">OAuth 2.1</div>
+        <div class="protocol-desc">Authorization framework with PKCE, DPoP, and RAR.</div>
+        <div class="protocol-meta">
+          <span>RFC 6749</span>
+          <span>RFC 7636</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">OpenID Connect</div>
+        <div class="protocol-desc">Identity layer on OAuth 2.0. OpenID Certified™.</div>
+        <div class="protocol-meta">
+          <span>1.0</span>
+          <span>Certified</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">SAML 2.0</div>
+        <div class="protocol-desc">Enterprise SSO for legacy and regulated workloads.</div>
+        <div class="protocol-meta">
+          <span>IdP</span>
+          <span>SP</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">SCIM 2.0</div>
+        <div class="protocol-desc">Automated user provisioning, inbound & outbound.</div>
+        <div class="protocol-meta">
+          <span>RFC 7643</span>
+          <span>RFC 7644</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">FIDO2 / WebAuthn</div>
+        <div class="protocol-desc">Passwordless, phishing-resistant authentication.</div>
+        <div class="protocol-meta">
+          <span>Level 2</span>
+          <span>CTAP2</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">LDAP / LDAPS</div>
+        <div class="protocol-desc">Directory integration for on-prem systems.</div>
+        <div class="protocol-meta">
+          <span>v3</span>
+          <span>TLS</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">WS-Fed</div>
+        <div class="protocol-desc">Legacy federation for older Microsoft stacks.</div>
+        <div class="protocol-meta">
+          <span>Passive</span>
+        </div>
+      </div>
+      <div class="protocol reveal">
+        <div class="protocol-name">CAS</div>
+        <div class="protocol-desc">Central Authentication Service for higher-ed.</div>
+        <div class="protocol-meta">
+          <span>3.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPLIANCE ============ -->
+<section class="section-pad compliance-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Compliance</div>
+      <h2 class="section-title">Audit-ready, <span class="serif">by default.</span></h2>
+      <p class="section-desc">
+        VERIDA is independently audited against the world's strictest security and privacy
+        frameworks. We do the paperwork so you can ship.
+      </p>
+    </div>
+
+    <div class="compliance-grid">
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">SOC 2</div>
+        <div class="compliance-name">Type II</div>
+        <div class="compliance-desc">Trust Services Criteria</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">ISO</div>
+        <div class="compliance-name">27001 · 27701</div>
+        <div class="compliance-desc">InfoSec & Privacy</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">GDPR</div>
+        <div class="compliance-name">EU · UK</div>
+        <div class="compliance-desc">Data protection</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">HIPAA</div>
+        <div class="compliance-name">BAA available</div>
+        <div class="compliance-desc">Healthcare workloads</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">FedRAMP</div>
+        <div class="compliance-name">Moderate</div>
+        <div class="compliance-desc">U.S. federal cloud</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">PCI</div>
+        <div class="compliance-name">DSS Level 1</div>
+        <div class="compliance-desc">Payment security</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">FINRA</div>
+        <div class="compliance-name">SEC · MiFID</div>
+        <div class="compliance-desc">Financial services</div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="compliance-logo">FERPA</div>
+        <div class="compliance-name">Higher-ed</div>
+        <div class="compliance-desc">Student records</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="section-pad">
+  <div class="container">
+    <div class="testimonial reveal">
+      <p class="testimonial-quote">
+        We replaced three identity vendors with VERIDA in a single quarter. Our auth latency
+        dropped 60%, our SOC 2 audit took two weeks instead of two months, and our developers
+        actually enjoy writing access policies now. That last part I didn't think was possible.
+      </p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">EM</div>
+        <div>
+          <div class="testimonial-name">Elena Marchetti</div>
+          <div class="testimonial-role">VP of Security · Helios Labs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section-pad" id="pricing" style="background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-tag">// Pricing</div>
+      <h2 class="section-title">Fair pricing. <span class="serif">No surprises.</span></h2>
+      <p class="section-desc">
+        Start free. Scale to millions of users. Pay only for the monthly active users you
+        actually authenticate.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-name">Developer</div>
+        <div class="price-amount">
+          <span class="num">$0</span>
+          <span class="per">/ month</span>
+        </div>
+        <div class="price-desc">Up to 7,000 MAUs. Perfect for prototypes and early-stage products.</div>
+        <ul class="price-features">
+          <li>SSO (SAML, OIDC)</li>
+          <li>MFA (TOTP, email)</li>
+          <li>Up to 5 team members</li>
+          <li>Community support</li>
+          <li>Shared infrastructure</li>
+        </ul>
+        <button class="price-btn">Start free</button>
+      </div>
+
+      <div class="price-card featured reveal">
+        <div class="price-name">Growth</div>
+        <div class="price-amount">
+          <span class="num">$0.02</span>
+          <span class="per">/ MAU</span>
+        </div>
+        <div class="price-desc">For scaling SaaS products that need enterprise features and SLAs.</div>
+        <ul class="price-features">
+          <li>Everything in Developer</li>
+          <li>FIDO2 / passkeys</li>
+          <li>Advanced RBAC & ABAC</li>
+          <li>99.95% uptime SLA</li>
+          <li>Email & chat support</li>
+          <li>Custom domains & branding</li>
+        </ul>
+        <button class="price-btn">Start 14-day trial</button>
+      </div>
+
+      <div class="price-card reveal">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount">
+          <span class="num">Custom</span>
+        </div>
+        <div class="price-desc">For organizations with complex compliance, scale, and residency needs.</div>
+        <ul class="price-features">
+          <li>Everything in Growth</li>
+          <li>Dedicated tenant & region</li>
+          <li>99.99% uptime SLA</li>
+          <li>Solution architect</li>
+          <li>24/7 premium support</li>
+          <li>HIPAA, FedRAMP, FINRA</li>
+        </ul>
+        <button class="price-btn">Contact sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta-section">
+  <div class="cta-content reveal">
+    <h2>Ready to <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;">rethink</span> identity?</h2>
+    <p>
+      Get up and running in under 10 minutes. Free forever for up to 7,000 monthly active users.
+      No credit card required.
+    </p>
+    <div class="cta-buttons">
+      <a href="#" class="btn btn-primary btn-lg">Start building free →</a>
+      <a href="#" class="btn btn-outline btn-lg">Talk to sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        VERIDA
+      </div>
+      <p>
+        The identity platform for teams that ship fast and sleep well. Built in San Francisco,
+        Zurich, and Bengaluru.
+      </p>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <span style="padding: 4px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">SOC 2</span>
+        <span style="padding: 4px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">ISO 27001</span>
+        <span style="padding: 4px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">GDPR</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Product</h5>
+      <a href="#">SSO</a>
+      <a href="#">MFA</a>
+      <a href="#">RBAC</a>
+      <a href="#">Provisioning</a>
+      <a href="#">Audit logs</a>
+      <a href="#">API auth</a>
+    </div>
+    <div class="footer-col">
+      <h5>Developers</h5>
+      <a href="#">Documentation</a>
+      <a href="#">API reference</a>
+      <a href="#">SDKs</a>
+      <a href="#">Quickstarts</a>
+      <a href="#">Status</a>
+      <a href="#">Changelog</a>
+    </div>
+    <div class="footer-col">
+      <h5>Solutions</h5>
+      <a href="#">SaaS companies</a>
+      <a href="#">Enterprises</a>
+      <a href="#">Universities</a>
+      <a href="#">Healthcare</a>
+      <a href="#">Financial services</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About</a>
+      <a href="#">Customers</a>
+      <a href="#">Careers</a>
+      <a href="#">Security</a>
+      <a href="#">Contact</a>
+      <a href="#">Blog</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Verida, Inc. All rights reserved.</div>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">DPA</a>
+      <a href="#">Trust Center</a>
+      <a href="#">Cookie settings</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============ REVEAL ON SCROLL ============
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ============ FEATURE CARD CURSOR GLOW ============
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--mx', x + '%');
+      card.style.setProperty('--my', y + '%');
+    });
+  });
+
+  // ============ LOGIN DEMO ANIMATION ============
+  const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+  let currentStep = 2; // 0-indexed, start at step 3
+
+  function advanceLoginDemo() {
+    // Reset all
+    steps.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('active', 'done');
+      const indicator = el.querySelector('.step-indicator');
+      const status = el.querySelector('.step-status');
+      if (i < currentStep) {
+        el.classList.add('done');
+        indicator.textContent = '✓';
+        status.textContent = '200 OK';
+      } else if (i === currentStep) {
+        el.classList.add('active');
+        indicator.textContent = (i + 1);
+        status.textContent = i === 2 ? 'evaluating…' : 'issuing…';
+      } else {
+        indicator.textContent = (i + 1);
+        status.textContent = 'pending';
+      }
+    });
+
+    currentStep++;
+    if (currentStep > 3) {
+      // After completing, reset to step 3 after a pause
+      setTimeout(() => {
+        currentStep = 2;
+        advanceLoginDemo();
+      }, 2500);
+      // Show final state briefly
+      steps.forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.classList.remove('active');
+        el.classList.add('done');
+        el.querySelector('.step-indicator').textContent = '✓';
+        el.querySelector('.step-status').textContent = i === 3 ? '201 Created' : '200 OK';
+      });
+      return;
+    }
+    setTimeout(advanceLoginDemo, 1800);
+  }
+
+  // Start animation when hero is visible
+  setTimeout(advanceLoginDemo, 1500);
+
+  // ============ SMOOTH NAV SHADOW ============
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      nav.style.background = 'rgba(10, 10, 15, 0.9)';
+      nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
+    } else {
+      nav.style.background = 'rgba(10, 10, 15, 0.7)';
+      nav.style.boxShadow = 'none';
+    }
+  });
+
+  // ============ PARALLAX ORBS ============
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    document.querySelector('.bg-orb-1').style.transform = `translateY(${y * 0.15}px)`;
+    document.querySelector('.bg-orb-2').style.transform = `translateY(${y * -0.1}px)`;
+    document.querySelector('.bg-orb-3').style.transform = `translateY(${y * 0.08}px)`;
+  });
+</script>
+
+</body>
+</html>
